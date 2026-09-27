@@ -1,0 +1,1034 @@
+/* =========================================================
+   BudgetFlow — страница регистрации
+   Один файл: переменные, фон, шапка, карточка, форма,
+   поля, чекбокс, кнопки, адаптив
+   ========================================================= */
+
+
+/* =========================================================
+   1. ПЕРЕМЕННЫЕ
+   ========================================================= */
+:root {
+  --bg: #0b0e14;
+  --bg-elev: #121622;
+  --bg-elev-2: #161b29;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-card-hover: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --text: #e8ecf4;
+  --text-muted: #8a93a6;
+  --text-dim: #5b6376;
+
+  --accent: #6c8cff;
+  --accent-2: #a06bff;
+  --success: #35d07f;
+  --warning: #ffb648;
+  --danger: #ff6b6b;
+
+  --gradient: linear-gradient(135deg, #6c8cff 0%, #a06bff 100%);
+  --gradient-soft: linear-gradient(135deg, rgba(108,140,255,.15), rgba(160,107,255,.15));
+
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 22px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.5);
+
+  --container: 1180px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="light"] {
+  --bg: #f6f7fb;
+  --bg-elev: #ffffff;
+  --bg-elev-2: #fbfcfe;
+  --bg-card: rgba(0, 0, 0, 0.02);
+  --bg-card-hover: rgba(0, 0, 0, 0.045);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.16);
+
+  --text: #0b0e14;
+  --text-muted: #565e73;
+  --text-dim: #8a93a6;
+
+  --shadow-sm: 0 2px 8px rgba(20, 30, 60, 0.06);
+  --shadow: 0 12px 32px rgba(20, 30, 60, 0.10);
+  --shadow-lg: 0 24px 60px rgba(20, 30, 60, 0.16);
+}
+
+
+/* =========================================================
+   2. СБРОС
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease);
+  position: relative;
+}
+
+img, svg { display: block; max-width: 100%; }
+button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+::selection {
+  background: rgba(108, 140, 255, 0.35);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 10px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+
+/* =========================================================
+   3. ФОН
+   ========================================================= */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.35;
+  animation: float 20s ease-in-out infinite;
+}
+
+.orb--1 {
+  width: 560px; height: 560px;
+  background: radial-gradient(circle, #6c8cff, transparent 70%);
+  top: -200px; left: -160px;
+}
+.orb--2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #a06bff, transparent 70%);
+  top: 15%; right: -180px;
+  animation-delay: -7s;
+}
+.orb--3 {
+  width: 440px; height: 440px;
+  background: radial-gradient(circle, #35d07f, transparent 70%);
+  bottom: -140px; left: 25%;
+  opacity: 0.22;
+  animation-delay: -13s;
+}
+.orb--4 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, #4dd0e1, transparent 70%);
+  top: 55%; left: -120px;
+  opacity: 0.18;
+  animation-delay: -4s;
+}
+
+[data-theme="light"] .orb { opacity: 0.20; }
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(40px, -50px) scale(1.1); }
+}
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, #000 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, transparent 75%);
+}
+
+[data-theme="light"] .bg-grid {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+}
+
+
+/* =========================================================
+   4. УТИЛИТЫ
+   ========================================================= */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.gradient-text {
+  background: linear-gradient(
+    90deg,
+    #6c8cff 0%,
+    #a06bff 40%,
+    #35d07f 80%,
+    #6c8cff 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientShift 8s linear infinite;
+}
+
+@keyframes gradientShift {
+  to { background-position: 200% center; }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  background: var(--gradient-soft);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  backdrop-filter: blur(8px);
+}
+
+.badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.85); }
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.link:hover {
+  color: var(--accent-2);
+  text-decoration-color: currentColor;
+}
+
+
+/* =========================================================
+   5. ШАПКА
+   ========================================================= */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  gap: 24px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.logo__mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--gradient);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(108, 140, 255, 0.4);
+  transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s var(--ease);
+}
+
+.logo:hover .logo__mark {
+  transform: rotate(-8deg) scale(1.08);
+  box-shadow: 0 8px 24px rgba(108, 140, 255, 0.55);
+}
+
+.logo__text strong {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nav { display: flex; gap: 4px; }
+
+.nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s var(--ease);
+}
+
+.nav__link:hover {
+  color: var(--text);
+  background: var(--bg-card);
+  transform: translateX(-2px);
+}
+
+.header-actions { display: flex; align-items: center; gap: 8px; }
+
+
+/* =========================================================
+   6. КНОПКИ
+   ========================================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: all 0.2s var(--ease);
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn--primary {
+  background: var(--gradient);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(108, 140, 255, 0.35);
+}
+
+.btn--primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transition: left 0.65s var(--ease);
+  pointer-events: none;
+}
+
+.btn--primary:hover:not(:disabled)::before { left: 100%; }
+
+.btn--primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(108, 140, 255, 0.5);
+}
+
+.btn--primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 14px rgba(108, 140, 255, 0.4);
+}
+
+.btn--ghost {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.btn--block { width: 100%; }
+
+.btn--lg {
+  padding: 15px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.btn__label { position: relative; z-index: 1; }
+.btn__icon  { position: relative; z-index: 1; transition: transform 0.25s var(--ease); }
+.btn--primary:hover:not(:disabled) .btn__icon { transform: translateX(3px); }
+
+.spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  position: relative;
+  z-index: 1;
+}
+
+.btn[disabled] .spinner { display: inline-block; }
+.btn[disabled] .btn__icon { display: none; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* =========================================================
+   7. ОСНОВНОЙ LAYOUT — всё по центру
+   ========================================================= */
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  min-height: calc(100vh - 68px);
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.auth-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Скрываем правую промо-колонку */
+.auth-aside { display: none; }
+
+
+/* =========================================================
+   8. КАРТОЧКА ФОРМЫ
+   ========================================================= */
+.auth-card {
+  width: 100%;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+  animation: cardIn 0.5s var(--ease);
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: -100px;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(108, 140, 255, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-card__head {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.auth-card__title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 10px;
+  color: var(--text);
+  text-align: center;
+}
+
+.auth-card__subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 340px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.auth-card__badge {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+
+/* =========================================================
+   9. ФОРМА
+   ========================================================= */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.field__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: left;
+  padding-left: 2px;
+}
+
+.field__hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  min-height: 14px;
+  padding-left: 2px;
+  transition: color 0.2s var(--ease);
+}
+
+.field__hint--strength {
+  margin-top: 4px;
+}
+
+
+/* =========================================================
+   10. ИНПУТЫ — полупрозрачные, белый текст
+   ========================================================= */
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition:
+    background 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 400;
+}
+
+.input:hover:not(:focus) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.input:focus {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(108, 140, 255, 0.7);
+  box-shadow:
+    0 0 0 4px rgba(108, 140, 255, 0.15),
+    0 4px 16px rgba(108, 140, 255, 0.1);
+}
+
+.input--with-icon {
+  padding-left: 44px;
+}
+
+.input--with-action {
+  padding-right: 44px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  transition: color 0.25s var(--ease);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-wrap:focus-within .input-icon {
+  color: var(--accent);
+}
+
+.input-action {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.input-action:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.input-status {
+  position: absolute;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: #fff;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease-bounce);
+}
+
+.input-wrap.is-valid .input-status {
+  opacity: 1;
+  transform: scale(1);
+  background: var(--success);
+}
+
+.input-wrap.is-invalid .input-status {
+  opacity: 1;
+  transform: scale(1);
+  background: var(--danger);
+}
+
+.input-wrap.is-valid .input {
+  border-color: rgba(53, 208, 127, 0.5);
+}
+
+.input-wrap.is-invalid .input {
+  border-color: rgba(255, 107, 107, 0.5);
+}
+
+/* Светлая тема для инпутов */
+[data-theme="light"] .input {
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .input::placeholder {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] .input:hover:not(:focus) {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .input:focus {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .input-icon,
+[data-theme="light"] .input-action {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================================================
+   11. ИНДИКАТОР НАДЁЖНОСТИ ПАРОЛЯ
+   ========================================================= */
+.strength {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.strength__bar {
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.3s var(--ease);
+}
+
+[data-theme="light"] .strength__bar {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.strength[data-level="1"] .strength__bar:nth-child(-n+1) { background: var(--danger); }
+.strength[data-level="2"] .strength__bar:nth-child(-n+2) { background: var(--warning); }
+.strength[data-level="3"] .strength__bar:nth-child(-n+3) { background: var(--accent); }
+.strength[data-level="4"] .strength__bar               { background: var(--success); }
+
+
+/* =========================================================
+   12. ЧЕКБОКС
+   ========================================================= */
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.checkbox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkbox__box {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  transition: all 0.2s var(--ease);
+  margin-top: 1px;
+}
+
+[data-theme="light"] .checkbox__box {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--text);
+}
+
+.checkbox:hover .checkbox__box {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.checkbox input:checked + .checkbox__box {
+  background: var(--gradient);
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(108, 140, 255, 0.35);
+  color: #fff;
+}
+
+.checkbox__box svg {
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease-bounce);
+}
+
+.checkbox input:checked + .checkbox__box svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.checkbox__text {
+  flex: 1;
+  padding-top: 1px;
+}
+
+
+/* =========================================================
+   13. ОШИБКИ, РАЗДЕЛИТЕЛЬ, АЛЬТ-КНОПКИ, ССЫЛКА
+   ========================================================= */
+.form-error {
+  font-size: 13px;
+  color: var(--danger);
+  min-height: 18px;
+  text-align: center;
+  margin: -4px 0 0;
+  line-height: 1.4;
+  padding: 0 8px;
+}
+
+.form-error:not(:empty) {
+  padding: 10px 14px;
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+  border-radius: var(--radius-sm);
+}
+
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 6px 0;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider span {
+  position: relative;
+  display: inline-block;
+  padding: 0 14px;
+  background: var(--bg-elev);
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.alt-auth {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.alt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s var(--ease);
+}
+
+[data-theme="light"] .alt-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.alt-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .alt-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.auth-switch {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.auth-switch a {
+  color: var(--accent);
+  font-weight: 600;
+  transition: color 0.2s var(--ease);
+}
+
+.auth-switch a:hover {
+  color: var(--accent-2);
+}
+
+
+/* =========================================================
+   14. СНОСКА ПОД КАРТОЧКОЙ
+   ========================================================= */
+.auth-footnote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 0 16px;
+  line-height: 1.5;
+}
+
+.auth-footnote svg {
+  flex-shrink: 0;
+  color: var(--success);
+}
+
+
+/* =========================================================
+   15. ТОСТ
+   ========================================================= */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translate(-50%, 24px);
+  padding: 14px 22px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s var(--ease);
+  z-index: 1000;
+  max-width: calc(100% - 48px);
+}
+
+.toast--show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.toast--success { border-color: rgba(53, 208, 127, 0.5); color: var(--success); }
+.toast--error   { border-color: rgba(255, 107, 107, 0.5); color: var(--danger); }
+.toast--info    { border-color: var(--border-strong); }
+
+
+/* =========================================================
+   16. АДАПТИВ
+   ========================================================= */
+@media (max-width: 520px) {
+  .auth-main {
+    padding: 32px 16px;
+  }
+
+  .auth-card {
+    padding: 28px 22px;
+    border-radius: var(--radius);
+  }
+
+  .auth-card__title {
+    font-size: 22px;
+  }
+
+  .auth-card__subtitle {
+    font-size: 13px;
+  }
+
+  .input {
+    padding: 13px 14px;
+    font-size: 14px;
+  }
+
+  .input--with-icon {
+    padding-left: 40px;
+  }
+
+  .input--with-action {
+    padding-right: 40px;
+  }
+
+  .alt-auth {
+    grid-template-columns: 1fr;
+  }
+
+  .divider span {
+    padding: 0 10px;
+  }
+}
+
+
+/* =========================================================
+   17. REDUCED MOTION
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

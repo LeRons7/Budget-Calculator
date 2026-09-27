@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BudgetCalculator — умное распределение дохода</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+  <!-- Фоновые градиентные пятна -->
+  <div class="bg-orbs" aria-hidden="true">
+    <span class="orb orb--1"></span>
+    <span class="orb orb--2"></span>
+    <span class="orb orb--3"></span>
+  </div>
+
+  <!-- Шапка -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <span class="logo__mark">₿</span>
+        <span class="logo__text">Budget<strong>Calculator</strong></span>
+      </a>
+
+      <nav class="nav">
+        <a href="#calculator" class="nav__link">Калькулятор</a>
+        <a href="#rules" class="nav__link">Правила</a>
+        <a href="#history" class="nav__link">История</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="btn btn--ghost" id="themeToggle" aria-label="Сменить тему">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
+        <button class="btn btn--primary" id="loginBtn"><a href="registration.html"></a>Войти</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero container">
+      <div class="hero__text">
+        <span class="badge">Правило 50/30/20 под контролем</span>
+        <h1 class="hero__title">
+          Распределяй доход <span class="gradient-text">осознанно</span>
+        </h1>
+        <p class="hero__subtitle">
+          Введи сумму — BudgetCalculator сам разложит её по категориям, сохранит историю
+          и покажет прогресс к целям. Ты можешь менять проценты под себя.
+        </p>
+
+        <div class="hero__stats">
+          <div class="stat">
+            <span class="stat__value" id="statDistributed">0 ₽</span>
+            <span class="stat__label">распределено</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value" id="statSaved">0 ₽</span>
+            <span class="stat__label">отложено</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value" id="statOperations">0</span>
+            <span class="stat__label">операций</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__card">
+        <div class="mini-chart" aria-hidden="true">
+          <div class="mini-chart__bar" style="--h: 40%"></div>
+          <div class="mini-chart__bar" style="--h: 65%"></div>
+          <div class="mini-chart__bar" style="--h: 30%"></div>
+          <div class="mini-chart__bar" style="--h: 80%"></div>
+          <div class="mini-chart__bar" style="--h: 55%"></div>
+          <div class="mini-chart__bar" style="--h: 90%"></div>
+          <div class="mini-chart__bar" style="--h: 70%"></div>
+        </div>
+        <div class="mini-chart__caption">
+          <span>Твой прогресс за 7 дней</span>
+          <span class="up">+18%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Калькулятор -->
+    <section class="section container" id="calculator">
+      <div class="section__head">
+        <h2 class="section__title">Калькулятор</h2>
+        <p class="section__subtitle">Введи сумму дохода и нажми «Распределить»</p>
+      </div>
+
+      <div class="calculator-grid">
+        <!-- Форма -->
+        <form class="card form-card" id="calcForm" novalidate>
+          <div class="field">
+            <label for="amount" class="field__label">Сумма дохода</label>
+            <div class="input-group">
+              <input
+                type="number"
+                id="amount"
+                name="amount"
+                class="input input--lg"
+                placeholder="100 000"
+                min="0"
+                step="100"
+                inputmode="decimal"
+                required
+              />
+              <span class="input-group__suffix">₽</span>
+            </div>
+            <p class="field__error" id="amountError" role="alert"></p>
+          </div>
+
+          <div class="chips" id="quickAmounts">
+            <button type="button" class="chip" data-amount="30000">30 000</button>
+            <button type="button" class="chip" data-amount="50000">50 000</button>
+            <button type="button" class="chip" data-amount="100000">100 000</button>
+            <button type="button" class="chip" data-amount="150000">150 000</button>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Схема распределения</label>
+            <div class="preset-list" id="presetList">
+              <label class="preset">
+                <input type="radio" name="preset" value="50-30-20" checked />
+                <span class="preset__body">
+                  <span class="preset__name">50 / 30 / 20</span>
+                  <span class="preset__desc">Классика: нужды, развлечения, сбережения</span>
+                </span>
+              </label>
+              <label class="preset">
+                <input type="radio" name="preset" value="70-20-10" />
+                <span class="preset__body">
+                  <span class="preset__name">70 / 20 / 10</span>
+                  <span class="preset__desc">Акцент на текущие расходы</span>
+                </span>
+              </label>
+              <label class="preset">
+                <input type="radio" name="preset" value="60-20-20" />
+                <span class="preset__body">
+                  <span class="preset__name">60 / 20 / 20</span>
+                  <span class="preset__desc">Баланс между расходами и накоплениями</span>
+                </span>
+              </label>
+              <label class="preset">
+                <input type="radio" name="preset" value="custom" />
+                <span class="preset__body">
+                  <span class="preset__name">Своя схема</span>
+                  <span class="preset__desc">Настроить проценты вручную</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--block" id="distributeBtn">
+            <span>Распределить</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </button>
+        </form>
+
+        <!-- Результат -->
+        <div class="card result-card" id="resultCard">
+          <div class="result-card__head">
+            <h3 class="result-card__title">Распределение</h3>
+            <span class="badge badge--soft" id="resultTotal">— ₽</span>
+          </div>
+
+          <div class="donut-wrap">
+            <svg class="donut" viewBox="0 0 42 42" id="donut" aria-hidden="true">
+              <circle class="donut__ring" cx="21" cy="21" r="15.9"></circle>
+            </svg>
+            <div class="donut__center">
+              <span class="donut__value" id="donutValue">0 ₽</span>
+              <span class="donut__label">доход</span>
+            </div>
+          </div>
+
+          <ul class="breakdown" id="breakdown">
+            <li class="breakdown__empty">Здесь появится разбивка по категориям</li>
+          </ul>
+
+          <div class="result-actions">
+            <button class="btn btn--ghost btn--block" id="saveBtn" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                <path d="M17 21v-8H7v8M7 3v5h8" />
+              </svg>
+              Сохранить в историю
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Свои правила -->
+    <section class="section container" id="rules">
+      <div class="section__head">
+        <h2 class="section__title">Свои правила</h2>
+        <p class="section__subtitle">Меняй категории и проценты — сумма всегда должна быть 100%</p>
+      </div>
+
+      <div class="card rules-card">
+        <ul class="rule-list" id="ruleList">
+          <!-- заполняется через JS -->
+        </ul>
+
+        <div class="rules-footer">
+          <div class="rules-total">
+            <span>Итого:</span>
+            <strong id="rulesTotal">100%</strong>
+          </div>
+          <div class="rules-actions">
+            <button class="btn btn--ghost" id="addRuleBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Добавить категорию
+            </button>
+            <button class="btn btn--primary" id="applyRulesBtn">Применить</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- История -->
+    <section class="section container" id="history">
+      <div class="section__head section__head--row">
+        <div>
+          <h2 class="section__title">История</h2>
+          <p class="section__subtitle">Последние распределения</p>
+        </div>
+        <button class="btn btn--ghost" id="clearHistoryBtn">Очистить</button>
+      </div>
+
+      <div class="card table-card">
+        <table class="table" id="historyTable">
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Доход</th>
+              <th>Отложено</th>
+              <th>Схема</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr class="table__empty">
+              <td colspan="5">Пока пусто. Сохрани первое распределение.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span class="logo__text">Budget<strong>Calculator</strong></span>
+      <span class="footer__copy">© <span id="year"></span> — pet-project on Go + JS</span>
+    </div>
+  </footer>
+
+  <!-- Тост -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+  <script src="animation.js"></script>
+</body>
+</html>
