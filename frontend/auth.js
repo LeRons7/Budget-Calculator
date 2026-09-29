@@ -1,8 +1,4 @@
-/* =========================================================
-   BudgetFlow — страница авторизации (вход и регистрация)
-   Зависимости: нет
-   Требует: backend endpoints /api/auth/register и /api/auth/login
-   ========================================================= */
+
 
 (function () {
   'use strict';
@@ -129,7 +125,6 @@
     if (loginForm) loginForm.hidden = isRegister;
     if (registerForm) registerForm.hidden = !isRegister;
 
-    // Обновляем URL без перезагрузки
     const url = new URL(window.location.href);
     if (isRegister) {
       url.searchParams.set('mode', 'register');
@@ -138,13 +133,11 @@
     }
     window.history.replaceState({}, '', url);
 
-    // Очищаем ошибки при переключении
     const loginError = $('#loginError');
     const registerError = $('#registerError');
     if (loginError) loginError.textContent = '';
     if (registerError) registerError.textContent = '';
 
-    // Фокус на первое поле
     setTimeout(() => {
       const firstInput = isRegister ? $('#registerEmail') : $('#loginEmail');
       firstInput?.focus();
@@ -186,7 +179,6 @@
       const email = $('#loginEmail').value.trim();
       const password = $('#loginPassword').value;
 
-      // Клиентская валидация
       const emailErr = validateEmail(email);
       if (emailErr) {
         if (errorEl) errorEl.textContent = emailErr;
@@ -205,7 +197,6 @@
         if (!data.token) throw new Error('Сервер не вернул токен');
         setToken(data.token);
         showToast('Успешный вход!', 'success');
-        // Редирект на главную через 600 мс, чтобы тост успел показаться
         setTimeout(() => {
           window.location.href = '/';
         }, 600);
@@ -234,7 +225,6 @@
       const password = $('#registerPassword').value;
       const confirm = $('#registerConfirm').value;
 
-      // Клиентская валидация
       const emailErr = validateEmail(email);
       if (emailErr) {
         if (errorEl) errorEl.textContent = emailErr;
@@ -314,10 +304,8 @@
       return;
     }
 
-    // Режим из URL
     setMode(getModeFromUrl());
 
-    // Обработчики
     bindLoginForm();
     bindRegisterForm();
     bindSwitches();
