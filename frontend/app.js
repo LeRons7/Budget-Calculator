@@ -1,31 +1,18 @@
-/* =========================================================
-   BudgetCalculator — клиент для Go-API
-   Версия: 1.0
-   Зависимости: нет
-   Требует: backend на том же origin, endpoints см. в API_BASE
-   ========================================================= */
 
 (function () {
   'use strict';
 
-  // =========================================================
-  // 1. КОНФИГ
-  // =========================================================
-  // Если фронт раздаётся с того же сервера, что и API, —
-  // оставляем относительный путь. Иначе поменяй на полный URL.
   const API_BASE = '/api';
 
   const TOKEN_KEY = 'budgetCalculator_token';
   const THEME_KEY = 'budgetCalculator_theme';
 
-  // Дефолтные правила — используются, пока пользователь не вошёл
   const DEFAULT_RULES = [
     { name: 'Нужды',      percent: 50, color: '#6c8cff' },
     { name: 'Развлечения',    percent: 30, color: '#DAA520' },
     { name: 'Сбережения', percent: 20, color: '#35d07f' },
   ];
 
-  // Пресеты схем распределения
   const PRESETS = {
     '50-30-20': [
       { name: 'Нужды',      percent: 50, color: '#6c8cff' },
@@ -44,7 +31,6 @@
     ],
   };
 
-  // Палитра для новых категорий
   const COLOR_PALETTE = [
     '#6c8cff', '#DAA520', '#35d07f', '#ffb648',
     '#ff6b6b', '#4dd0e1', '#f06292', '#9575cd',
@@ -67,7 +53,6 @@
   const $  = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // Форматирование денег
   const moneyFmt = new Intl.NumberFormat('ru-RU', {
     style: 'currency',
     currency: 'RUB',
@@ -75,7 +60,6 @@
   });
   const fmtMoney = (n) => moneyFmt.format(Number(n) || 0);
 
-  // Форматирование даты
   const dateFmt = new Intl.DateTimeFormat('ru-RU', {
     day: '2-digit',
     month: 'short',
@@ -89,7 +73,6 @@
     catch { return '—'; }
   };
 
-  // Экранирование HTML — защита от XSS
   const escapeHtml = (str) =>
     String(str ?? '').replace(/[&<>"']/g, (c) => ({
       '&': '&amp;',
@@ -115,13 +98,7 @@
   // =========================================================
   // 4. HTTP-КЛИЕНТ
   // =========================================================
-  /**
-   * Обёртка над fetch:
-   *  - добавляет Content-Type и Authorization
-   *  - парсит JSON
-   *  - бросает ошибку с читаемым сообщением
-   *  - при 401 автоматически разлогинивает
-   */
+
   async function apiFetch(path, options = {}) {
     const headers = {
       'Content-Type': 'application/json',
@@ -139,13 +116,11 @@
       throw new Error('Нет соединения с сервером');
     }
 
-    // 401 — токен протух или невалиден
     if (res.status === 401) {
       logout(false);
       throw new Error('Сессия истекла, войдите снова');
     }
 
-    // Пустой ответ (204) — просто возвращаем null
     if (res.status === 204) return null;
 
     const text = await res.text();
@@ -227,7 +202,7 @@
       let value;
 
       if (isLast) {
-        value = amount - allocated; // добираем остаток
+        value = amount - allocated; 
       } else {
         value = Math.round((amount * rule.percent) / 100);
         allocated += value;
@@ -245,10 +220,9 @@
   }
 
   async function distribute(amount) {
-    // Локальный расчёт (для мгновенного отображения)
+     
     const local = calculateDistribution(amount);
 
-    // Если авторизован — сохраняем на бэке и берём результат оттуда
     if (state.token) {
       const saved = await apiFetch('/distribute', {
         method: 'POST',
@@ -263,7 +237,6 @@
       return saved;
     }
 
-    // Иначе — только локальный preview
     state.currentDistribution = {
       id: null,
       amount,
@@ -336,7 +309,6 @@
     const donut = document.getElementById('donut');
     if (!donut) return;
 
-    // Удаляем старые сегменты
     donut.querySelectorAll('.donut__seg').forEach((s) => s.remove());
 
     const totalPercent = items.reduce((sum, i) => sum + Number(i.percent || 0), 0);
@@ -359,7 +331,6 @@
         seg.setAttribute('cy', '21');
         seg.setAttribute('r', '15.9');
 
-        // Финальные значения сразу — без анимации
         seg.setAttribute('stroke-dasharray', `${percent} ${100 - percent}`);
         seg.setAttribute('stroke-dashoffset', -offset);
 
@@ -487,7 +458,6 @@
       </li>
     `).join('');
 
-    // Название
     list.querySelectorAll('[data-name]').forEach((inp) => {
       inp.addEventListener('input', () => {
         const i = Number(inp.dataset.name);
@@ -506,13 +476,11 @@
         updateRulesTotal();
       });
       inp.addEventListener('blur', () => {
-        // На блюр нормализуем значение в поле
         const i = Number(inp.dataset.percent);
         inp.value = state.rules[i].percent;
       });
     });
 
-    // Удаление
     list.querySelectorAll('[data-remove]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const i = Number(btn.dataset.remove);
@@ -526,7 +494,6 @@
       });
     });
 
-    // Клик по точке — циклическая смена цвета
     list.querySelectorAll('[data-color]').forEach((dot) => {
       dot.addEventListener('click', () => {
         const i = Number(dot.dataset.color);
@@ -571,11 +538,9 @@
     }
   }
 
-  // Открыть модальное окно авторизации
   function openAuthModal(mode = 'login') {
     const dialog = $('#authModal');
     if (!dialog) {
-      // Фолбэк на prompt, если модалки нет в HTML
       return promptFallback(mode);
     }
     dialog.dataset.mode = mode;
@@ -591,7 +556,6 @@
     }
   }
 
-  // Фолбэк через prompt (если в HTML нет <dialog id="authModal">)
   function promptFallback(mode) {
     const email = prompt('Email:');
     if (!email) return;
@@ -613,11 +577,9 @@
   // =========================================================
   function bindEvents() {
 
-    // --- Год в футере ---
     const yearEl = $('#year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-    // --- Тема ---
     const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
@@ -628,7 +590,6 @@
       localStorage.setItem(THEME_KEY, next);
     });
 
-    // --- Форма распределения ---
     const form = $('#calcForm');
     if (form) {
       form.addEventListener('submit', async (e) => {
@@ -638,7 +599,6 @@
         const errorEl = $('#amountError');
         const amount = Number(input.value);
 
-        // Валидация
         if (!input.value || !amount || amount <= 0) {
           if (errorEl) errorEl.textContent = 'Введите сумму больше 0';
           input.classList.add('shake');
@@ -647,7 +607,6 @@
         }
         if (errorEl) errorEl.textContent = '';
 
-        // Проверка суммы процентов
         const totalPercent = state.rules.reduce(
           (s, r) => s + Number(r.percent || 0), 0
         );
@@ -659,7 +618,6 @@
           return;
         }
 
-        // Отправка
         const btn = $('#distributeBtn');
         if (btn) btn.disabled = true;
 
@@ -827,7 +785,7 @@
         await renderHistory();
       }
     } else {
-      await renderHistory(); // покажет "Войдите..."
+      await renderHistory(); 
     }
 
     // Публичный API для отладки из консоли
